@@ -1,0 +1,1 @@
+1. "@id" "@string"是怎么索引resource的

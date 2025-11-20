@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MyAwesomeApp</string>
+    <string name="menu_descrip">menu图标</string>
+    <string name="tab_shangcheng">商城</string>
+    <string name="tab_beijing">北京</string>
+    <string name="tab_tuangou">团购</string>
+    <string name="tab_guanzhu">关注</string>
+    <string name="tab_shequ">社区</string>
+    <string name="tab_tuijian">推荐</string>
+</resources>
