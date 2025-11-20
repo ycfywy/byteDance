@@ -1,16 +1,19 @@
 package com.ycf.handson.model;
 
+import lombok.Data;
+
 // 对应 post.clips 列表中的每一个片段。
+@Data
 public class Clip {
     // 片段类型（0：图片，1：视频）
-    public int type;
+    private int type;
 
     // 宽度
-    public int width;
+    private int width;
 
     // 高度
-    public int height;
+    private int height;
 
     // 资源链接
-    public String url;
+    private String url;
 }

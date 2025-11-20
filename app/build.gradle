@@ -38,6 +38,18 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-    implementation 'com.squareup.okhttp3:okhttp:5.3.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation libs.okhttp
+    implementation libs.gson
+
+    // lombok
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok.v11830
+    //圆形头像
+    implementation libs.circleimageview
+    // Glide 的核心库
+    implementation libs.glide
+
+    // 如果您使用 Java，强烈建议添加注解处理器，提高编译速度和性能
+    annotationProcessor libs.compiler
+
 }

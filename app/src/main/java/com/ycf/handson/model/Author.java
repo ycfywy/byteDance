@@ -1,12 +1,15 @@
 package com.ycf.handson.model;
 
+import lombok.Data;
+
+@Data
 public class Author {
     // 用户ID
-    public String user_id;
+    private String user_id;
 
     // 用户昵称
-    public String nickname;
+    private String nickname;
 
     // 头像链接
-    public String avatar;
+    private String avatar;
 }

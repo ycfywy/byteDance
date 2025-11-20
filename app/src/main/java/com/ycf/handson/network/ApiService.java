@@ -68,11 +68,11 @@ public class ApiService {
                         String json = response.body().string();
                         Log.d(TAG, "Received JSON: " + json.substring(0, Math.min(json.length(), 200)) + "...");
                         FeedResponse feedResponse = gson.fromJson(json, FeedResponse.class);
-                        if (feedResponse.status_code == 0) {
-                            Log.i(TAG, "Data fetched successfully. Posts count: " + feedResponse.post_list.size());
+                        if (feedResponse.getStatus_code() == 0) {
+                            Log.i(TAG, "Data fetched successfully. Posts count: " + feedResponse.getPost_list().size());
                             callback.onSuccess(feedResponse);
                         } else {
-                            String errorMsg = "接口状态码错误: " + feedResponse.status_code;
+                            String errorMsg = "接口状态码错误: " + feedResponse.getStatus_code();
                             Log.w(TAG, errorMsg);
                             callback.onFailure(errorMsg);
                         }

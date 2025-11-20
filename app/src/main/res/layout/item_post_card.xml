@@ -2,7 +2,6 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout="@layout/item_post_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
@@ -45,7 +44,7 @@
             app:layout_constraintTop_toBottomOf="@id/post_media_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="作品标题：客户端训练营快来参与，展示你的作品标题！" />
+            tools:text="塞维利亚的广场简直太美丽了，特别是日落时分，简..." />
 
         <TextView
             android:id="@+id/post_content"
@@ -57,24 +56,53 @@
             android:textSize="14sp"
             android:maxLines="3"
             android:ellipsize="end"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/post_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="作品正文：这是作品的详细内容，通常包含用户发布的文字，可能很长，所以我们限制一下行数。" />
+            tools:text="作品正文：这是作品的详细内容，通常包含用户发布的文字..." />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/author_avatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@tools:sample/avatars"
+            app:layout_constraintTop_toBottomOf="@id/post_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:civ_border_width="0.5dp"
+            app:civ_border_color="#CCCCCC" />
 
         <TextView
             android:id="@+id/author_nickname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
             android:textSize="12sp"
-            app:layout_constraintTop_toBottomOf="@id/post_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="作者：营业中 (12306)" />
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@id/author_avatar"
+            app:layout_constraintBottom_toBottomOf="@id/author_avatar"
+            app:layout_constraintStart_toEndOf="@id/author_avatar"
+            app:layout_constraintEnd_toStartOf="@id/like_count"
+            tools:text="我是福狸8.0" />
 
+        <TextView
+            android:id="@+id/like_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:drawablePadding="4dp"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/author_avatar"
+            app:layout_constraintBottom_toBottomOf="@id/author_avatar"
+            tools:text="195"
+            android:gravity="center_vertical"
+            app:drawableStartCompat="@drawable/ic_heart" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
