@@ -82,8 +82,13 @@ public class TabNavigationController implements View.OnClickListener {
             selectedTab = clickedTab;
             updateTabStyles(selectedTab);
 
-            // TODO: 在这里调用加载新数据的逻辑
+            loadFeedData(selectedTab.getText().toString());
         }
+    }
+
+    private void loadFeedData(String tabName) {
+//        if(tabName.equals("社区"))
+
     }
 
     private void updateTabStyles(TextView newSelectedTab) {
