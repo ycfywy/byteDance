@@ -1,6 +1,7 @@
 package com.ycf.handson.model;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Data;
 
@@ -31,5 +32,8 @@ public class Post {
 
     // 话题标签列表
     private List<Hashtag> hashtag;
+
+    // 点赞数
+    private int like_count = ThreadLocalRandom.current().nextInt(1, 500);
 
 }

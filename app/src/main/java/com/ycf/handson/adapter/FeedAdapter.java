@@ -21,17 +21,14 @@ import com.ycf.handson.model.Post;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder> {
-    private final Random random;
     private final Context context;
     private final List<Post> postList;
 
     public FeedAdapter(Context context) {
         this.context = context;
         this.postList = new ArrayList<>();
-        this.random = new Random();
     }
 
     /**
@@ -134,7 +131,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                 Author author = post.getAuthor();
                 tvAuthorNickname.setText(author.getNickname());
                 // 似乎没有点赞数目 这里random一下
-                tvLikeCount.setText(String.valueOf(random.nextInt(500)));
+                tvLikeCount.setText(String.valueOf(post.getLike_count()));
 
                 // 加载头像 (使用 Glide)
                 Glide.with(itemView.getContext())

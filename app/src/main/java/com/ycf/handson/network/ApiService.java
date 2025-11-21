@@ -66,7 +66,8 @@ public class ApiService {
                 if (response.isSuccessful()) {
                     try {
                         String json = response.body().string();
-                        Log.d(TAG, "Received JSON: " + json.substring(0, Math.min(json.length(), 200)) + "...");
+                        Log.d(TAG, "Received JSON: " + json);
+                        System.out.println("==========" + json);
                         FeedResponse feedResponse = gson.fromJson(json, FeedResponse.class);
                         if (feedResponse.getStatus_code() == 0) {
                             Log.i(TAG, "Data fetched successfully. Posts count: " + feedResponse.getPost_list().size());

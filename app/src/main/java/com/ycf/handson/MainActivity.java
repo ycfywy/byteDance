@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ycf.handson.controller.FeedListController;
 import com.ycf.handson.controller.TabNavigationController;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TabNavigationController.attach(this);
+        FeedListController.attach(this);
     }
 
 
