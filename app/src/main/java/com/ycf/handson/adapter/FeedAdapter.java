@@ -1,6 +1,8 @@
 package com.ycf.handson.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +11,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.ycf.handson.R;
+import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
 import com.ycf.handson.model.Post;
@@ -26,9 +30,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     private final Context context;
     private final List<Post> postList;
 
+    private final LikeStatusManager likeStatusManager;
+
     public FeedAdapter(Context context) {
         this.context = context;
         this.postList = new ArrayList<>();
+        this.likeStatusManager = new LikeStatusManager(context);
     }
 
     /**
@@ -57,6 +64,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Post post = postList.get(position);
+        // 从pref中获取isLiked
+        post.setLiked(likeStatusManager.isLiked(post.getPost_id()));
         holder.bind(post);
     }
 
@@ -74,11 +83,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     /**
      * 首次加载或下拉刷新时调用
      */
-    public void setData(List<Post> newPosts) {
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void clear() {
         postList.clear();
-        if (newPosts != null) {
-            postList.addAll(newPosts);
-        }
         notifyDataSetChanged();
     }
 
@@ -170,6 +178,36 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                 ivCover.setVisibility(View.GONE);
             }
 
+            // 4. 新增：处理点赞的逻辑(点赞的heart图片放在 text view里面 不是很懂)
+            updateLikeUI(post.isLiked(), post.getLike_count());
+
+            tvLikeCount.setOnClickListener(v -> {
+
+                boolean newLiked = !post.isLiked();
+                likeStatusManager.toggleLike(post.getPost_id(), newLiked);
+                int newCount = post.getLike_count() + ((newLiked) ? 1 : -1);
+                post.setLike_count(newCount);
+                post.setLiked(newLiked);
+                updateLikeUI(newLiked, newCount);
+
+            });
+
+
+        }
+
+        public void updateLikeUI(boolean isLiked, int count) {
+            Drawable heartIcon = isLiked ? ContextCompat.getDrawable(
+                    itemView.getContext(), R.drawable.ic_heart_liked
+            ) : ContextCompat.getDrawable(
+                    itemView.getContext(), R.drawable.ic_heart_unliked
+            );
+
+            if (heartIcon != null) {
+                tvLikeCount.setCompoundDrawablesWithIntrinsicBounds(
+                        heartIcon, null, null, null
+                );
+            }
+            tvLikeCount.setText(String.valueOf(count));
 
         }
     }

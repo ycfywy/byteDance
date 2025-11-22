@@ -36,4 +36,6 @@ public class Post {
     // 点赞数
     private int like_count = ThreadLocalRandom.current().nextInt(1, 500);
 
+
+    private boolean isLiked;
 }

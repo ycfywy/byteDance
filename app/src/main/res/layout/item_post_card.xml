@@ -102,7 +102,7 @@
             app:layout_constraintBottom_toBottomOf="@id/author_avatar"
             tools:text="195"
             android:gravity="center_vertical"
-            app:drawableStartCompat="@drawable/ic_heart" />
+            app:drawableStartCompat="@drawable/ic_heart_unliked" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

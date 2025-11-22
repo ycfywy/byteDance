@@ -6,6 +6,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ycf.handson.R;
 import com.ycf.handson.adapter.FeedAdapter;
@@ -19,11 +20,14 @@ import com.ycf.handson.network.ApiService;
 public class FeedListController implements ApiService.FeedCallback {
 
     private static final int FEED_RECYCLE_VIEW_ID = R.id.recycler_view_feed;
+
+    private static final int SWIPE_REFRESH_LAYOUT_ID = R.id.swipe_refresh_layout;
     private static final int SPAN_COUNT = 2;
 
     private static final int VISIBLE_THRESHOLD = 5;
     private final Activity activity;
     private final RecyclerView recyclerView;
+    private final SwipeRefreshLayout swipeRefreshLayout;
     private final FeedAdapter adapter;
     private final ApiService apiService;
 
@@ -31,13 +35,31 @@ public class FeedListController implements ApiService.FeedCallback {
     private boolean isLoading = false;  // 是否正在加载数据，防止重复请求
     private static final int LOAD_LIMIT = 20; // 每次加载的条数
 
-    public FeedListController(Activity activity, RecyclerView recyclerView) {
+    public FeedListController(Activity activity, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout) {
         this.activity = activity;
         this.recyclerView = recyclerView;
         this.adapter = new FeedAdapter(activity);
         this.apiService = new ApiService();
-
+        this.swipeRefreshLayout = swipeRefreshLayout;
         setupRecycleView();
+        setupSwipeRefresh();
+    }
+
+    private void setupSwipeRefresh() {
+
+        // 当用户下拉时触发
+        swipeRefreshLayout.setOnRefreshListener(this::refreshFeed);
+    }
+
+    private void refreshFeed() {
+        if (isLoading) {
+            // 如果正在进行其他加载，可以取消刷新指示器，或者等待
+            swipeRefreshLayout.setRefreshing(false);
+            return;
+        }
+        adapter.clear();
+        isLoading = true;
+        apiService.fetchFeed(LOAD_LIMIT, true, this);
     }
 
     private void setupRecycleView() {
@@ -86,7 +108,14 @@ public class FeedListController implements ApiService.FeedCallback {
             throw new IllegalStateException("RecyclerView with ID R.id." + resourceName + " not found in the layout.");
         }
 
-        FeedListController controller = new FeedListController(activity, recyclerView);
+        SwipeRefreshLayout swipeRefreshLayout = activity.findViewById(SWIPE_REFRESH_LAYOUT_ID);
+        if (swipeRefreshLayout == null) {
+            String resourceName = activity.getResources().getResourceEntryName(SWIPE_REFRESH_LAYOUT_ID);
+            throw new IllegalStateException("SwipeRefreshLayout with ID R.id." + resourceName + " not found in the layout.");
+        }
+
+
+        FeedListController controller = new FeedListController(activity, recyclerView, swipeRefreshLayout);
         controller.loadFeed();
         return controller;
     }
@@ -106,12 +135,14 @@ public class FeedListController implements ApiService.FeedCallback {
         activity.runOnUiThread(() -> {
             if (response.getPost_list() != null && !response.getPost_list().isEmpty()) {
                 adapter.appendData(response.getPost_list());
-
             } else {
                 Toast.makeText(activity, "UI: 未获取到帖子数据", Toast.LENGTH_SHORT).show();
             }
 
             isLoading = false;
+            if (swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
 
         });
     }
@@ -121,6 +152,10 @@ public class FeedListController implements ApiService.FeedCallback {
         activity.runOnUiThread(() -> {
             isLoading = false;
             Toast.makeText(activity, "UI: 加载失败: " + errorMessage, Toast.LENGTH_LONG).show();
+
+            if (swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
 
     }
