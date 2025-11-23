@@ -2,8 +2,10 @@ package com.ycf.handson.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.model.Author;
@@ -67,6 +70,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
         // 从pref中获取isLiked
         post.setLiked(likeStatusManager.isLiked(post.getPost_id()));
         holder.bind(post);
+
     }
 
     /**
@@ -83,6 +87,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     /**
      * 首次加载或下拉刷新时调用
      */
+
 
     @SuppressLint("NotifyDataSetChanged")
     public void clear() {
@@ -101,6 +106,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
         }
     }
 
+    private void startDetailActivity(Post post) {
+        Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra("EXTRA_POST_OBJECT", post);
+        Log.d("INTENT", post.toString());
+        context.startActivity(intent);
+    }
 
     // ViewHolder是干嘛的 ？ 缓存每个列表项视图（item_post_card.xml）
     // 中的所有子控件（TextView, ImageView），避免每次滚动时都去调用耗费资源的 findViewById。
@@ -127,6 +138,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
             tvAuthorNickname = itemView.findViewById(R.id.author_nickname); // 原来的昵称TextView
             ivAuthorAvatar = itemView.findViewById(R.id.author_avatar);     // 新增的头像ImageView
             tvLikeCount = itemView.findViewById(R.id.like_count);           // 新增的点赞数量TextView
+
+
+            // 设置点击跳转事件
+            itemView.setOnClickListener(v -> {
+
+                int curPosition = getAbsoluteAdapterPosition();
+                if (curPosition != RecyclerView.NO_POSITION) {
+                    Post clickedPost = postList.get(curPosition);
+                    FeedAdapter.this.startDetailActivity(clickedPost);
+                }
+
+            });
         }
 
         public void bind(Post post) {
