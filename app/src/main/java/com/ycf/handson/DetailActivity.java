@@ -1,6 +1,8 @@
 package com.ycf.handson;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,6 +14,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.ycf.handson.adapter.GalleryAdapter;
+import com.ycf.handson.manager.BgmManager;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
@@ -22,6 +26,7 @@ import java.util.List;
 public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_POST_ID = "EXTRA_POST_ID";
 
+    private static final String TAG = "DETAIL_ACTIVITY";
     // --- 顶部栏 Views ---
     private ImageView btnBack;
     private ShapeableImageView ivAuthorAvatar;
@@ -31,9 +36,12 @@ public class DetailActivity extends AppCompatActivity {
     // --- 内容区 Views ---
     private ViewPager2 viewPagerGallery;
     private LinearLayout layoutIndicators; // 用于放置 ViewPager2 的指示器
+
+    private ImageView ivBgmIcon;
     private TextView tvPostTitle;
     private TextView tvPostContent;
     private TextView tvPostDate;
+
 
     // --- 底部栏 Views ---
     private LinearLayout btnActionLike;
@@ -45,6 +53,8 @@ public class DetailActivity extends AppCompatActivity {
     private String currentPostId;
     private LikeStatusManager likeStatusManager;
     private Post currentPost; // 实际帖子数据对象
+
+    private BgmManager bgmManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +83,8 @@ public class DetailActivity extends AppCompatActivity {
 
         // 内容区
         viewPagerGallery = findViewById(R.id.view_pager_gallery);
-        layoutIndicators = findViewById(R.id.layout_indicators);
+
+        ivBgmIcon = findViewById(R.id.iv_bgm_icon);
         tvPostTitle = findViewById(R.id.tv_post_title);
         tvPostContent = findViewById(R.id.tv_post_content);
         tvPostDate = findViewById(R.id.tv_post_date);
@@ -82,6 +93,7 @@ public class DetailActivity extends AppCompatActivity {
         btnActionLike = findViewById(R.id.btn_action_like);
         ivLike = findViewById(R.id.iv_like);
         tvLikeCount = findViewById(R.id.tv_like_count);
+
 
     }
 
@@ -99,6 +111,8 @@ public class DetailActivity extends AppCompatActivity {
 
 
         // 2. 内容区
+        this.bgmManager = BgmManager.create(ivBgmIcon, post.getMusic());
+
 
         tvPostTitle.setText(post.getTitle());
         tvPostContent.setText(post.getContent());
@@ -109,14 +123,34 @@ public class DetailActivity extends AppCompatActivity {
         List<Clip> clips = post.getClips();
         if (clips != null && !clips.isEmpty()) {
             // TODO: 需要实现 GalleryAdapter 来处理 ViewPager2
-            // GalleryAdapter adapter = new GalleryAdapter(this, clips);
-            // viewPagerGallery.setAdapter(adapter);
-            // setupIndicators(clips.size());
+            Log.d(TAG, clips.toString());
+            GalleryAdapter adapter = new GalleryAdapter(this);
+            adapter.appenData(clips);
+
+            viewPagerGallery.setAdapter(adapter);
         } else {
             viewPagerGallery.setVisibility(View.GONE);
             layoutIndicators.setVisibility(View.GONE);
         }
 
+
+        btnBack.setOnClickListener(v -> {
+
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
+        if (bgmManager != null) {
+            bgmManager.release();
+        }
+    }
 }
