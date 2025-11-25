@@ -79,7 +79,7 @@ public class BgmManager {
         mediaPlayer = new MediaPlayer();
 
         try {
-
+            Log.d(TAG, currentMusic.toString());
             mediaPlayer.setDataSource(currentMusic.getUrl());
 
             // 从网络中加载资源 设置为异步

@@ -1,15 +1,23 @@
 package com.ycf.handson;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +27,7 @@ import com.ycf.handson.manager.BgmManager;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
+import com.ycf.handson.model.Hashtag;
 import com.ycf.handson.model.Post;
 
 import java.util.List;
@@ -115,7 +124,7 @@ public class DetailActivity extends AppCompatActivity {
 
 
         tvPostTitle.setText(post.getTitle());
-        tvPostContent.setText(post.getContent());
+        renderPostContent(post, tvPostContent);
         tvPostDate.setText("创建时间: " + post.getCreate_time());
 
 
@@ -135,22 +144,108 @@ public class DetailActivity extends AppCompatActivity {
 
 
         btnBack.setOnClickListener(v -> {
-
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
             finish();
         });
 
     }
 
 
+    /**
+     *
+     * 使用SpannableString 高亮content关键词
+     *
+     * @param post     需要渲染内容的post
+     * @param textView 装content的textView
+     */
+    public void renderPostContent(Post post, TextView textView) {
+
+        if (post == null || post.getContent() == null) {
+            textView.setText("");
+            return;
+        }
+        String content = post.getContent();
+        List<Hashtag> hashtags = post.getHashtag();
+
+        SpannableString spannableContent = new SpannableString(content);
+        int highlightColor = ContextCompat.getColor(this, R.color.hashtag_highlight);
+
+        if (hashtags != null) {
+            for (Hashtag tag : hashtags) {
+                int start = tag.getStart();
+                int end = tag.getEnd();
+
+                if (start >= 0 && end <= content.length() && start < end) {
+                    String tagText = content.substring(start, end);
+                    spannableContent.setSpan(getHashtagClickableSpan(tagText, this, highlightColor),
+                            start,
+                            end,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+
+        }
+
+        textView.setText(spannableContent);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+
+    }
+
+
+    private ClickableSpan getHashtagClickableSpan(final String tagText, final Context context, final int highlightColor) {
+
+        return new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                Intent intent = new Intent(context, TagDetailActivity.class);
+                intent.putExtra(TagDetailActivity.EXTRA_HASHTAG_TEXT, tagText);
+                context.startActivity(intent);
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(highlightColor);
+                ds.setUnderlineText(false);
+            }
+        };
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bgmManager != null) {
+            bgmManager.pause();
+        }
+
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onRestart started");
+        super.onRestart();
+        if (bgmManager != null) {
+            bgmManager.play();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume started");
+        super.onResume();
+        if (bgmManager != null) {
+            bgmManager.play();
+        }
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-
         if (bgmManager != null) {
             bgmManager.release();
         }
     }
+
+
 }
