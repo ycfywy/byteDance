@@ -29,6 +29,7 @@ import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
 import com.ycf.handson.model.Hashtag;
 import com.ycf.handson.model.Post;
+import com.ycf.handson.utils.DateUtil;
 
 import java.util.List;
 
@@ -125,7 +126,7 @@ public class DetailActivity extends AppCompatActivity {
 
         tvPostTitle.setText(post.getTitle());
         renderPostContent(post, tvPostContent);
-        tvPostDate.setText("创建时间: " + post.getCreate_time());
+        tvPostDate.setText(DateUtil.formatRelativeTime(post.getCreate_time()));
 
 
         // 3. 如何实现轮播 ?
@@ -229,15 +230,6 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume started");
-        super.onResume();
-        if (bgmManager != null) {
-            bgmManager.play();
-        }
-
-    }
 
     @Override
     protected void onDestroy() {

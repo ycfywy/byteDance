@@ -3,7 +3,6 @@ package com.ycf.handson.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -34,6 +32,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     private final List<Post> postList;
 
     private final LikeStatusManager likeStatusManager;
+
+
+    private static final String TAG = "FeedAdapter";
 
     public FeedAdapter(Context context) {
         this.context = context;
@@ -127,6 +128,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
         ImageView ivAuthorAvatar;  // 作者头像
         TextView tvLikeCount;      // 点赞数量
 
+        ImageView ivLikeIcon;
+
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -138,6 +141,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
             tvAuthorNickname = itemView.findViewById(R.id.author_nickname); // 原来的昵称TextView
             ivAuthorAvatar = itemView.findViewById(R.id.author_avatar);     // 新增的头像ImageView
             tvLikeCount = itemView.findViewById(R.id.like_count);           // 新增的点赞数量TextView
+            ivLikeIcon = itemView.findViewById(R.id.like_icon);
 
 
             // 设置点击跳转事件
@@ -178,6 +182,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                 int height = first.getHeight();
                 // TODO type先不管
 
+
+                Log.d(TAG, first.toString());
+
                 if (width > 0 && height > 0) {
 
                     // 获取当前屏幕的信息
@@ -191,11 +198,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     params.height = viewHeight;
                     ivCover.setLayoutParams(params);
+
+                    Log.d(TAG, "image size" + params.width + " " + params.height);
                 }
                 Glide.with(itemView.getContext())
                         .load(coverUrl)
                         .apply(RequestOptions.bitmapTransform(new RoundedCorners(16)))
                         .into(ivCover);
+
+
             } else {
                 // TODO 这里设置为不可见
                 ivCover.setVisibility(View.GONE);
@@ -204,7 +215,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
             // 4. 新增：处理点赞的逻辑(点赞的heart图片放在 text view里面 不是很懂)
             updateLikeUI(post.isLiked(), post.getLike_count());
 
-            tvLikeCount.setOnClickListener(v -> {
+            ivLikeIcon.setOnClickListener(v -> {
 
                 boolean newLiked = !post.isLiked();
                 likeStatusManager.toggleLike(post.getPost_id(), newLiked);
@@ -219,17 +230,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
         }
 
         public void updateLikeUI(boolean isLiked, int count) {
-            Drawable heartIcon = isLiked ? ContextCompat.getDrawable(
-                    itemView.getContext(), R.drawable.ic_heart_liked
-            ) : ContextCompat.getDrawable(
-                    itemView.getContext(), R.drawable.ic_heart_unliked
-            );
+            int heartIcon = isLiked ? R.drawable.ic_heart_liked
+                    : R.drawable.ic_heart_unliked;
 
-            if (heartIcon != null) {
-                tvLikeCount.setCompoundDrawablesWithIntrinsicBounds(
-                        heartIcon, null, null, null
-                );
-            }
+
+            ivLikeIcon.setImageResource(heartIcon);
             tvLikeCount.setText(String.valueOf(count));
 
         }

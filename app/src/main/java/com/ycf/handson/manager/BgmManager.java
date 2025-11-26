@@ -64,6 +64,7 @@ public class BgmManager {
         // 如果播放器已经准备好，直接开始/继续
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             mediaPlayer.start();
+            bgmIconView.setImageResource(playIconResId);
         }
     }
 
@@ -77,7 +78,6 @@ public class BgmManager {
     private void initializePlayer() {
 
         mediaPlayer = new MediaPlayer();
-
         try {
             Log.d(TAG, currentMusic.toString());
             mediaPlayer.setDataSource(currentMusic.getUrl());
