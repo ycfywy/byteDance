@@ -33,6 +33,7 @@ import com.ycf.handson.utils.DateUtil;
 
 import java.util.List;
 
+
 public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_POST_ID = "EXTRA_POST_ID";
 
@@ -122,6 +123,9 @@ public class DetailActivity extends AppCompatActivity {
 
         // 2. 内容区
         this.bgmManager = BgmManager.create(ivBgmIcon, post.getMusic());
+//
+//
+//        PlayerHelper.play();
 
 
         tvPostTitle.setText(post.getTitle());

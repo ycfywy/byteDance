@@ -15,8 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.LikeStatusManager;
@@ -108,6 +106,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     }
 
     private void startDetailActivity(Post post) {
+
+        // TODO 此处调用player 预先加载音乐
+
+//        PlayerHelper.setAndPrepare(post.getMusic().getUrl());
+
+
         Intent intent = new Intent(context, DetailActivity.class);
         intent.putExtra("EXTRA_POST_OBJECT", post);
         Log.d("INTENT", post.toString());
@@ -174,9 +178,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                         .into(ivAuthorAvatar);
 
             }
+
+
             // 3. 处理item中的主图 clip
             if (post.getClips() != null && !post.getClips().isEmpty()) {
                 Clip first = post.getClips().get(0);
+
                 String coverUrl = first.getUrl();
                 int width = first.getWidth();
                 int height = first.getHeight();
@@ -199,17 +206,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                     params.height = viewHeight;
                     ivCover.setLayoutParams(params);
 
-                    Log.d(TAG, "image size" + params.width + " " + params.height);
                 }
                 Glide.with(itemView.getContext())
                         .load(coverUrl)
-                        .apply(RequestOptions.bitmapTransform(new RoundedCorners(16)))
+                        .error(R.drawable.error_image)
                         .into(ivCover);
 
 
             } else {
                 // TODO 这里设置为不可见
-                ivCover.setVisibility(View.GONE);
+                Log.d(TAG, String.valueOf(post.getClips() == null));
+                ivCover.setImageResource(R.drawable.error_image);
             }
 
             // 4. 新增：处理点赞的逻辑(点赞的heart图片放在 text view里面 不是很懂)

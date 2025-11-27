@@ -81,7 +81,6 @@ public class TabNavigationController implements View.OnClickListener {
         if (clickedTab != selectedTab) {
             selectedTab = clickedTab;
             updateTabStyles(selectedTab);
-
             loadFeedData(selectedTab.getText().toString());
         }
     }

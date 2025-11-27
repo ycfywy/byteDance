@@ -3,4 +3,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="hashtag_highlight">#1DA1F2</color>
+
+
+    <color name="tiktok_bg">#FFFFFF</color>
+
+    <color name="tiktok_text_primary">#161823</color>
+
+    <color name="tiktok_text_secondary">#80161823</color>
+
+    <color name="tiktok_btn_bg">#F2F2F2</color>
 </resources>
