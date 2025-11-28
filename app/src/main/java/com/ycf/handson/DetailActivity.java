@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.media3.exoplayer.ExoPlayer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +26,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.ycf.handson.adapter.GalleryAdapter;
 import com.ycf.handson.manager.BgmManager;
 import com.ycf.handson.manager.LikeStatusManager;
+import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
 import com.ycf.handson.model.Hashtag;
@@ -67,12 +69,17 @@ public class DetailActivity extends AppCompatActivity {
 
     private BgmManager bgmManager;
 
+    private MediaPreloadManager preloadManager;
+    private ExoPlayer player;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
         initViews();
 
+        preloadManager = MediaPreloadManager.getInstance(this);
+        player = preloadManager.getPlayer();
 
         if (getIntent() != null) {
             Post post = getIntent().getParcelableExtra("EXTRA_POST_OBJECT");
@@ -121,11 +128,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
 
-        // 2. 内容区
-        this.bgmManager = BgmManager.create(ivBgmIcon, post.getMusic());
-//
-//
-//        PlayerHelper.play();
+        // TODO 此处调用player 预先加载音乐
+        preloadManager.play(post.getMusic());
 
 
         tvPostTitle.setText(post.getTitle());
@@ -219,9 +223,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (bgmManager != null) {
-            bgmManager.pause();
-        }
+        player.pause();
 
     }
 
@@ -229,18 +231,15 @@ public class DetailActivity extends AppCompatActivity {
     protected void onRestart() {
         Log.d(TAG, "onRestart started");
         super.onRestart();
-        if (bgmManager != null) {
-            bgmManager.play();
-        }
+        player.pause();
+        ;
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (bgmManager != null) {
-            bgmManager.release();
-        }
+        player.pause();
     }
 
 

@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.LikeStatusManager;
+import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.Author;
 import com.ycf.handson.model.Clip;
 import com.ycf.handson.model.Post;
@@ -25,8 +26,12 @@ import com.ycf.handson.model.Post;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder> {
     private final Context context;
+
+    @Getter
     private final List<Post> postList;
 
     private final LikeStatusManager likeStatusManager;
@@ -34,7 +39,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
 
     private static final String TAG = "FeedAdapter";
 
-    public FeedAdapter(Context context) {
+    public FeedAdapter(Context context, MediaPreloadManager mediaPreloadManager) {
         this.context = context;
         this.postList = new ArrayList<>();
         this.likeStatusManager = new LikeStatusManager(context);
@@ -107,11 +112,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
 
     private void startDetailActivity(Post post) {
 
-        // TODO 此处调用player 预先加载音乐
-
-//        PlayerHelper.setAndPrepare(post.getMusic().getUrl());
-
-
         Intent intent = new Intent(context, DetailActivity.class);
         intent.putExtra("EXTRA_POST_OBJECT", post);
         Log.d("INTENT", post.toString());
@@ -178,7 +178,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                         .into(ivAuthorAvatar);
 
             }
-
 
             // 3. 处理item中的主图 clip
             if (post.getClips() != null && !post.getClips().isEmpty()) {

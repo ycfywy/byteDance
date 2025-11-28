@@ -1,6 +1,7 @@
 package com.ycf.handson.controller;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -12,8 +13,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.ycf.handson.R;
 import com.ycf.handson.adapter.FeedAdapter;
+import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.FeedResponse;
+import com.ycf.handson.model.Music;
+import com.ycf.handson.model.Post;
 import com.ycf.handson.network.ApiService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * FeedListController 是用于管理瀑布流 RecyclerView 所有配置和数据流的控制器。
@@ -26,6 +35,8 @@ public class FeedListController implements ApiService.FeedCallback {
     private static final int SWIPE_REFRESH_LAYOUT_ID = R.id.swipe_refresh_layout;
 
     private static final int LOAD_ERROR_LAYOUT_ID = R.id.load_error_view;
+
+    private static final String TAG = "FeedListController";
 
     private static final int SPAN_COUNT = 2;
 
@@ -43,13 +54,18 @@ public class FeedListController implements ApiService.FeedCallback {
     private boolean isLoading = false;  // 是否正在加载数据，防止重复请求
     private static final int LOAD_LIMIT = 20; // 每次加载的条数
 
+    private final MediaPreloadManager mediaPreloadManager;
+
     public FeedListController(Activity activity, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, LinearLayout loadErrorLayout) {
         this.activity = activity;
         this.recyclerView = recyclerView;
-        this.adapter = new FeedAdapter(activity);
+
         this.loadErrorLayout = loadErrorLayout;
         this.apiService = new ApiService();
         this.swipeRefreshLayout = swipeRefreshLayout;
+
+        this.mediaPreloadManager = MediaPreloadManager.getInstance(activity);
+        this.adapter = new FeedAdapter(activity, mediaPreloadManager);
         setupRecycleView();
         setupSwipeRefresh();
         setupLoadError();
@@ -107,8 +123,6 @@ public class FeedListController implements ApiService.FeedCallback {
                 int totalCount = manager.getItemCount();
                 int[] lastVisibleItems = manager.findLastVisibleItemPositions(null);
                 int lastVisibleItemPosition = getLastVisibleItem(lastVisibleItems);
-
-
                 if ((totalCount - lastVisibleItemPosition) < VISIBLE_THRESHOLD) {
                     if (!isLoading) {
                         loadFeed();
@@ -117,64 +131,37 @@ public class FeedListController implements ApiService.FeedCallback {
             }
         });
 
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//
-//                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-//
-//                    int centerIndex = findCenterVisibleItemPosition(recyclerView, manager);
-//
-//                    if (centerIndex != RecyclerView.NO_POSITION) {
-//                        // 找到位于中心的 Item 索引: centerIndex
-//                        Log.d("CenterItem", "中心可见 Item 索引: " + centerIndex);
-//
-//                        // 现在你可以用这个索引来更新你的 PreloadManagerWrapper
-//                        // preloadManagerWrapper.setCurrentPlayingIndex(centerIndex);
-//
-//                        MediaPreloadManager
-//                    }
-//                }
-//            }
-//        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    Log.d(TAG, "Scroll stop, preload media begin");
+                    List<Music> visiblePostMusic = findVisiblePostMusic(manager);
+                    mediaPreloadManager.preloadMedia(visiblePostMusic);
+                }
+            }
+        });
     }
 
-//    private int findCenterVisibleItemPosition(RecyclerView recyclerView, StaggeredGridLayoutManager manager) {
-//
-//        int recyclerViewCenterY = recyclerView.getHeight() / 2;
-//
-//        int centerItemPosition = RecyclerView.NO_POSITION;
-//        double minDistance = Double.MAX_VALUE;
-//
-//        // 2. 遍历当前所有可见的 Item
-//        int firstVisible = manager.findFirstVisibleItemPositions();
-//        int lastVisible = manager.findLastVisibleItemPositions();
-//
-//        for (int i = firstVisible; i <= lastVisible; i++) {
-//            // 获取当前索引对应的 Item View
-//            View childView = manager.findViewByPosition(i);
-//
-//            if (childView == null) {
-//                continue;
-//            }
-//
-//            // 3. 计算当前 Item View 的中心 Y 坐标
-//            // childCenterY = childView.getTop() + (childView.getHeight() / 2)
-//            int childCenterY = childView.getTop() + (childView.getHeight() / 2);
-//
-//            // 4. 计算 Item 中心与 RecyclerView 中心之间的距离
-//            double distance = Math.abs(childCenterY - recyclerViewCenterY);
-//
-//            // 5. 找出距离最小（即最接近中心）的 Item
-//            if (distance < minDistance) {
-//                minDistance = distance;
-//                centerItemPosition = i;
-//            }
-//        }
-//
-//        return centerItemPosition;
-//    }
+    private List<Music> findVisiblePostMusic(StaggeredGridLayoutManager manager) {
+
+        int[] firstVisibleItemPositions = manager.findFirstVisibleItemPositions(null);
+        int[] lastVisibleItemPositions = manager.findLastVisibleItemPositions(null);
+
+
+        int l = Arrays.stream(firstVisibleItemPositions).max().getAsInt();
+        int r = Arrays.stream(lastVisibleItemPositions).max().getAsInt();
+
+        List<Post> postList = adapter.getPostList();
+
+        List<Music> musics = IntStream.range(l, r + 1).filter(i -> i >= 0 && i < postList.size())
+                .mapToObj(postList::get)
+                .map(post -> post.getMusic())
+                .collect(Collectors.toList());
+        return musics;
+    }
+
 
     /**
      * 辅助方法：获取 StaggeredGridLayoutManager 中最后可见的位置
@@ -226,7 +213,9 @@ public class FeedListController implements ApiService.FeedCallback {
     public void onSuccess(FeedResponse response) {
         activity.runOnUiThread(() -> {
             if (response.getPost_list() != null && !response.getPost_list().isEmpty()) {
+                List<Post> newPosts = response.getPost_list();
                 adapter.appendData(response.getPost_list());
+
             } else {
                 Toast.makeText(activity, "UI: 未获取到帖子数据", Toast.LENGTH_SHORT).show();
             }

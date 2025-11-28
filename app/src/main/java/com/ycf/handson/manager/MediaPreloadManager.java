@@ -6,19 +6,26 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
 import androidx.media3.exoplayer.source.preload.TargetPreloadStatusControl;
 
+import com.ycf.handson.model.Music;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 
 /**
  * MediaPreloadManager 以单例模式实现，管理 ExoPlayer 的预加载逻辑。
  */
+
+@OptIn(markerClass = UnstableApi.class)
 public class MediaPreloadManager {
 
     // 1. 静态私有实例变量：用于保存唯一的单例实例
@@ -42,6 +49,7 @@ public class MediaPreloadManager {
     private int currentPlayingIndex = 5;
 
     // 3. 私有构造函数：阻止外部创建实例
+
     private MediaPreloadManager(@NonNull Context context) {
 
         // 预加载状态控制逻辑（匿名内部类）
@@ -75,8 +83,6 @@ public class MediaPreloadManager {
 
     }
 
-    // 4. 静态公共获取方法：提供全局访问点
-    // 采用 synchronized 确保在多线程环境下的线程安全 (Thread Safety)
     public static synchronized MediaPreloadManager getInstance(@NonNull Context context) {
         if (instance == null) {
             // 只有第一次调用时才创建实例
@@ -86,10 +92,10 @@ public class MediaPreloadManager {
     }
 
 
-    public void play(MediaItem mediaItem) {
+    public void play(Music music) {
 
+        MediaItem mediaItem = MediaItem.fromUri(music.getUrl());
         MediaSource mediaSource = preloadManager.getMediaSource(mediaItem);
-
         if (mediaSource != null) {
             player.setMediaSource(mediaSource);
 
@@ -97,6 +103,7 @@ public class MediaPreloadManager {
             player.setMediaItem(mediaItem);
         }
         player.prepare();
+        player.seekTo(music.getSeek_time());
         player.play();
     }
 
@@ -110,50 +117,22 @@ public class MediaPreloadManager {
     }
 
 
-    public void setPreloadMediaItems(@NonNull List<MediaItem> mediaItems, int startWindowIndex, long startPositionMs) {
+    public void preloadMedia(List<Music> musics) {
 
-        // 1. 设置预加载列表
-        // 注意：DefaultPreloadManager 的 setMediaItems 并不直接支持 startWindowIndex/startPositionMs，
-        // 但我们会将这些信息用于 ExoPlayer 的设置。
-        // DefaultPreloadManager 依赖于其 setCurrentPlayingIndex 来驱动预加载。
 
-        // 由于 DefaultPreloadManager 没有 setMediaItems(List) 的方法，
-        // 最好的做法是使用其内部的 add/remove 逻辑，或者像下面这样，先移除所有，再添加所有。
+        List<MediaItem> mediaItems = musics.stream().map(music -> {
+            return MediaItem.fromUri(music.getUrl());
+        }).collect(Collectors.toList());
 
-        // 清空旧的预加载任务
         preloadManager.reset();
-
-        // 循环添加所有媒体项。索引 i 作为 rankingData 传入。
-        for (int i = 0; i < mediaItems.size(); i++) {
-            preloadManager.add(mediaItems.get(i), i);
-        }
-
-        // 2. 同时将媒体列表设置给播放器
-        player.setMediaItems(mediaItems, startWindowIndex, startPositionMs);
-
-        // 3. 更新当前播放索引，触发预加载（通常从 startWindowIndex 开始）
-        updateCurrentPlayingIndex(startWindowIndex);
-
-        // 4. 通知 PreloadManager 重新评估（虽然 setCurrentPlayingIndex 内部可能已经触发）
-        preloadManager.invalidate();
-    }
-
-    public void preloadMedia(List<MediaItem> mediaItems) {
 
         for (int i = 0; i < mediaItems.size(); i++) {
             MediaItem mediaItem = mediaItems.get(i);
             preloadManager.add(mediaItem, i);
         }
-
+        currentPlayingIndex = mediaItems.size() / 2;
         preloadManager.invalidate();
     }
 
-    public void updateCurrentPlayingIndex(int newIndex) {
-        if (this.currentPlayingIndex != newIndex) {
-            this.currentPlayingIndex = newIndex;
-            this.preloadManager.setCurrentPlayingIndex(newIndex);
-            this.preloadManager.invalidate();
-        }
-    }
 
 }
