@@ -56,7 +56,7 @@
             android:id="@+id/btn_follow"
             android:layout_width="64dp"
             android:layout_height="28dp"
-            android:background="@drawable/duxbutton"
+            android:background="@drawable/bg_btn_unfollowed"
             android:gravity="center"
             android:text="关注"
             android:textColor="#FF2442"

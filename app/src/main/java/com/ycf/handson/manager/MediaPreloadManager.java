@@ -1,7 +1,5 @@
 package com.ycf.handson.manager;
 
-import static java.lang.Math.abs;
-
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -15,8 +13,15 @@ import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
 import androidx.media3.exoplayer.source.preload.TargetPreloadStatusControl;
 
 import com.ycf.handson.model.Music;
+import com.ycf.handson.model.Post;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -48,6 +53,9 @@ public class MediaPreloadManager {
     // 假设这是需要被外部更新的变量
     private int currentPlayingIndex = 5;
 
+
+    private Map<String, MediaItem> postId2Media;
+
     // 3. 私有构造函数：阻止外部创建实例
 
     private MediaPreloadManager(@NonNull Context context) {
@@ -59,26 +67,15 @@ public class MediaPreloadManager {
                     @Override
                     public DefaultPreloadManager.PreloadStatus getTargetPreloadStatus(Integer index) {
 
-                        // 获取成员变量 currentPlayingIndex
-                        int distance = index - currentPlayingIndex;
+                        return DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(3000L);
 
-                        if (distance == 1) {
-                            return DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(5000L);
-                        } else if (distance == -1) {
-                            return DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(3000L);
-                        } else if (distance == 2) {
-                            return DefaultPreloadManager.PreloadStatus.TRACKS_SELECTED;
-                        } else if (abs(distance) <= 4) {
-                            return DefaultPreloadManager.PreloadStatus.SOURCE_PREPARED;
-                        }
-
-                        return null;
                     }
                 };
 
         DefaultPreloadManager.Builder builder = new DefaultPreloadManager.Builder(context, targetPreloadStatusControl);
         this.preloadManager = builder.build();
         this.player = builder.buildExoPlayer();
+        this.postId2Media = new HashMap<>();
 
 
     }
@@ -117,20 +114,30 @@ public class MediaPreloadManager {
     }
 
 
-    public void preloadMedia(List<Music> musics) {
+    public void preloadMedia(List<Post> post) {
 
+        post.forEach(new Consumer<Post>() {
+            @Override
+            public void accept(Post post) {
+                if (!postId2Media.containsKey(post.getPost_id())) {
+                    postId2Media.put(post.getPost_id(), MediaItem.fromUri(post.getMusic().getUrl()));
+                    preloadManager.add(Objects.requireNonNull(postId2Media.get(post.getPost_id())), 0);
+                }
+            }
+        });
 
-        List<MediaItem> mediaItems = musics.stream().map(music -> {
-            return MediaItem.fromUri(music.getUrl());
-        }).collect(Collectors.toList());
-
-        preloadManager.reset();
-
-        for (int i = 0; i < mediaItems.size(); i++) {
-            MediaItem mediaItem = mediaItems.get(i);
-            preloadManager.add(mediaItem, i);
+        Set<String> curCollect = post.stream().map(Post::getPost_id).collect(Collectors.toSet());
+        Iterator<Map.Entry<String, MediaItem>> iterator = postId2Media.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, MediaItem> entry = iterator.next();
+            String postId = entry.getKey();
+            MediaItem mediaItem = entry.getValue();
+            if (!curCollect.contains(postId)) {
+                preloadManager.remove(mediaItem);
+                iterator.remove();
+            }
         }
-        currentPlayingIndex = mediaItems.size() / 2;
+
         preloadManager.invalidate();
     }
 

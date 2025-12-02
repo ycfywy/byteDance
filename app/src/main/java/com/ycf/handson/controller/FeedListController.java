@@ -15,7 +15,6 @@ import com.ycf.handson.R;
 import com.ycf.handson.adapter.FeedAdapter;
 import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.FeedResponse;
-import com.ycf.handson.model.Music;
 import com.ycf.handson.model.Post;
 import com.ycf.handson.network.ApiService;
 
@@ -137,14 +136,14 @@ public class FeedListController implements ApiService.FeedCallback {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     Log.d(TAG, "Scroll stop, preload media begin");
-                    List<Music> visiblePostMusic = findVisiblePostMusic(manager);
-                    mediaPreloadManager.preloadMedia(visiblePostMusic);
+                    List<Post> visiblePosts = findVisiblePostMusic(manager);
+                    mediaPreloadManager.preloadMedia(visiblePosts);
                 }
             }
         });
     }
 
-    private List<Music> findVisiblePostMusic(StaggeredGridLayoutManager manager) {
+    private List<Post> findVisiblePostMusic(StaggeredGridLayoutManager manager) {
 
         int[] firstVisibleItemPositions = manager.findFirstVisibleItemPositions(null);
         int[] lastVisibleItemPositions = manager.findLastVisibleItemPositions(null);
@@ -155,11 +154,10 @@ public class FeedListController implements ApiService.FeedCallback {
 
         List<Post> postList = adapter.getPostList();
 
-        List<Music> musics = IntStream.range(l, r + 1).filter(i -> i >= 0 && i < postList.size())
+        List<Post> posts = IntStream.range(l, r + 1).filter(i -> i >= 0 && i < postList.size())
                 .mapToObj(postList::get)
-                .map(post -> post.getMusic())
                 .collect(Collectors.toList());
-        return musics;
+        return posts;
     }
 
 

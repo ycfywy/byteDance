@@ -13,7 +13,7 @@ public class FollowStatusManager {
     private final SharedPreferences prefs;
 
     public FollowStatusManager(Context context) {
-        // 使用 PRIVATE 模式创建 SharedPreferences 文件
+
         this.prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

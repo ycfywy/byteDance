@@ -10,6 +10,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.ycf.handson.adapter.GalleryAdapter;
 import com.ycf.handson.manager.BgmManager;
+import com.ycf.handson.manager.FollowStatusManager;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.Author;
@@ -72,6 +74,11 @@ public class DetailActivity extends AppCompatActivity {
     private MediaPreloadManager preloadManager;
     private ExoPlayer player;
 
+    private Boolean isPlay = true;
+
+    private FollowStatusManager followStatusManager;
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +87,8 @@ public class DetailActivity extends AppCompatActivity {
 
         preloadManager = MediaPreloadManager.getInstance(this);
         player = preloadManager.getPlayer();
+        followStatusManager = new FollowStatusManager(this);
+
 
         if (getIntent() != null) {
             Post post = getIntent().getParcelableExtra("EXTRA_POST_OBJECT");
@@ -102,10 +111,13 @@ public class DetailActivity extends AppCompatActivity {
         // 内容区
         viewPagerGallery = findViewById(R.id.view_pager_gallery);
 
+        layoutIndicators = findViewById(R.id.indicator_container);
+
         ivBgmIcon = findViewById(R.id.iv_bgm_icon);
         tvPostTitle = findViewById(R.id.tv_post_title);
         tvPostContent = findViewById(R.id.tv_post_content);
         tvPostDate = findViewById(R.id.tv_post_date);
+
 
         // 底部栏动作
         btnActionLike = findViewById(R.id.btn_action_like);
@@ -123,13 +135,29 @@ public class DetailActivity extends AppCompatActivity {
             tvAuthorName.setText(author.getNickname());
             Glide.with(this).load(author.getAvatar()).into(ivAuthorAvatar);
 
+            updateFollowButtonUI(author.getUser_id());
+
+            btnFollow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleFollow(author.getUser_id());
+                }
+            });
         } else {
             tvAuthorName.setText("未知作者");
         }
 
 
-        // TODO 此处调用player 预先加载音乐
         preloadManager.play(post.getMusic());
+
+
+        ivBgmIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isPlay = !isPlay;
+                player.setPlayWhenReady(isPlay);
+            }
+        });
 
 
         tvPostTitle.setText(post.getTitle());
@@ -137,15 +165,23 @@ public class DetailActivity extends AppCompatActivity {
         tvPostDate.setText(DateUtil.formatRelativeTime(post.getCreate_time()));
 
 
-        // 3. 如何实现轮播 ?
         List<Clip> clips = post.getClips();
         if (clips != null && !clips.isEmpty()) {
             // TODO: 需要实现 GalleryAdapter 来处理 ViewPager2
             Log.d(TAG, clips.toString());
             GalleryAdapter adapter = new GalleryAdapter(this);
             adapter.appenData(clips);
-
             viewPagerGallery.setAdapter(adapter);
+            setupIndicators(clips.size());
+
+            viewPagerGallery.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    updateIndicatorSelected(position);
+                }
+            });
+
         } else {
             viewPagerGallery.setVisibility(View.GONE);
             layoutIndicators.setVisibility(View.GONE);
@@ -156,6 +192,32 @@ public class DetailActivity extends AppCompatActivity {
             finish();
         });
 
+    }
+
+    private void toggleFollow(String userId) {
+
+        boolean newStatus = followStatusManager.toggleFollowStatus(userId);
+        updateFollowButtonUI(userId);
+        String message = newStatus ? "已关注" : "已取消关注";
+    }
+
+    private void updateFollowButtonUI(String userId) {
+
+        boolean isFollow = followStatusManager.isFollowing(userId);
+        if (isFollow) {
+
+            btnFollow.setText("已关注");
+            btnFollow.setTextColor(ContextCompat.getColor(this, R.color.followed_text_color));
+
+
+            btnFollow.setBackgroundResource(R.drawable.bg_btn_followed);
+
+        } else {
+            btnFollow.setText("关注");
+            btnFollow.setTextColor(ContextCompat.getColor(this, R.color.unfollow_text_color));
+
+            btnFollow.setBackgroundResource(R.drawable.bg_btn_unfollowed);
+        }
     }
 
 
@@ -217,6 +279,52 @@ public class DetailActivity extends AppCompatActivity {
                 ds.setUnderlineText(false);
             }
         };
+    }
+
+
+    // indicator相关代码
+
+    private void setupIndicators(int count) {
+
+        if (count <= 1) {
+            layoutIndicators.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutIndicators.removeAllViews();
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                1.0f
+        );
+
+        int marginPx = (int) (getResources().getDisplayMetrics().density * 4);
+        params.setMargins(marginPx, 0, marginPx, 0);
+
+        for (int i = 0; i < count; i++) {
+            View indicator = new View(this);
+
+            indicator.setLayoutParams(params);
+            indicator.getLayoutParams().height = (int) (getResources().getDisplayMetrics().density * 3);
+            indicator.setBackgroundResource(R.drawable.indicator_bar_unselected);
+            layoutIndicators.addView(indicator);
+        }
+
+        updateIndicatorSelected(0);
+
+    }
+
+    private void updateIndicatorSelected(int i) {
+        int childCount = layoutIndicators.getChildCount();
+        for (int i1 = 0; i1 < childCount; i1++) {
+            View childAt = layoutIndicators.getChildAt(i1);
+            if (i1 == i) {
+                childAt.setBackgroundResource(R.drawable.indicator_bar_selected);
+            } else {
+                childAt.setBackgroundResource(R.drawable.indicator_bar_unselected);
+            }
+        }
+
     }
 
 
