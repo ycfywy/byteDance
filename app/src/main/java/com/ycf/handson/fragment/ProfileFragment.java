@@ -9,17 +9,15 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 import com.ycf.handson.R;
 
 public class ProfileFragment extends Fragment {
 
     private TabLayout tabLayout;
-    private ViewPager2 viewPager;
+    private ViewPager2 viewPager; // 尽管我们不再使用，但保留以匹配布局
     private ImageView btnBack;
 
     // 标签页标题
@@ -41,38 +39,34 @@ public class ProfileFragment extends Fragment {
         viewPager = view.findViewById(R.id.view_pager);
         btnBack = view.findViewById(R.id.btn_back);
 
-        // 3. 设置 ViewPager2 适配器
-        viewPager.setAdapter(new RecyclerView.Adapter() {
-            @NonNull
+
+        for (String title : tabTitles) {
+            tabLayout.addTab(tabLayout.newTab().setText(title));
+        }
+
+        // 4. (可选) 如果您需要知道哪个 Tab 被选中，可以添加监听器
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return null;
+            public void onTabSelected(TabLayout.Tab tab) {
+                // 当前选中 Tab 的位置：tab.getPosition()
+                // 您可以在这里添加逻辑来替换 Fragment 或加载内容
             }
 
             @Override
-            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
+            public void onTabUnselected(TabLayout.Tab tab) {
+                //
             }
 
             @Override
-            public int getItemCount() {
-                return 0;
+            public void onTabReselected(TabLayout.Tab tab) {
+                //
             }
         });
 
-        // 4. 将 TabLayout 和 ViewPager2 关联起来
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(tabTitles[position])
-        ).attach();
-
         // 5. 设置返回按钮逻辑
         btnBack.setOnClickListener(v -> {
-            // 在 Fragment 中实现“返回”操作，通常是返回到上一个 Fragment 或关闭 Activity
+            // 在 Fragment 中实现“返回”操作
             if (getActivity() != null) {
-                // 如果是在 Activity 中，可以结束 Activity
-                // getActivity().finish();
-
-                // 如果是在 Fragment 栈中，可以弹出 Fragment
                 getParentFragmentManager().popBackStack();
             }
         });

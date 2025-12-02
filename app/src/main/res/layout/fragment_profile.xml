@@ -190,24 +190,8 @@
             app:tabIndicatorColor="#FE2C55"
             app:tabIndicatorHeight="2dp"
             app:tabSelectedTextColor="@color/tiktok_text_primary"
-
-
             app:tabTextColor="@color/tiktok_text_secondary">
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="作品" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="喜欢" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="私密" />
         </com.google.android.material.tabs.TabLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
