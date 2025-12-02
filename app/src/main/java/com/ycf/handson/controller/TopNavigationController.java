@@ -5,12 +5,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.ycf.handson.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabNavigationController implements View.OnClickListener {
+public class TopNavigationController implements View.OnClickListener {
+
+
+    private ConstraintLayout topBar;
 
     private List<TextView> allTabs;
     private TextView selectedTab = null;
@@ -20,7 +25,7 @@ public class TabNavigationController implements View.OnClickListener {
     /**
      * 构造函数：初始化控制器，并接收 Activity 作为上下文
      */
-    public TabNavigationController() {
+    public TopNavigationController() {
         this.allTabs = new ArrayList<>();
     }
 
@@ -29,8 +34,8 @@ public class TabNavigationController implements View.OnClickListener {
      *
      * @param activity 宿主 Activity
      */
-    public static TabNavigationController attach(Activity activity) {
-        TabNavigationController controller = new TabNavigationController();
+    public static TopNavigationController attach(Activity activity) {
+        TopNavigationController controller = new TopNavigationController();
         controller.setup(activity);
         return controller;
     }
@@ -42,7 +47,7 @@ public class TabNavigationController implements View.OnClickListener {
      */
     public void setup(Activity activity) {
         // 1. 找到所有 Tab 视图并添加到列表中
-
+        topBar = activity.findViewById(R.id.top_bar);
         TextView tabTongCheng = activity.findViewById(R.id.tab_shangcheng);
         TextView tabBeijing = activity.findViewById(R.id.tab_beijing);
         TextView tabTuangou = activity.findViewById(R.id.tab_tuangou);
@@ -103,5 +108,14 @@ public class TabNavigationController implements View.OnClickListener {
         } else {
             textView.setTextAppearance(R.style.TabTextStyle_Unselected);
         }
+    }
+
+    public void setBarsVisibility(boolean visible) {
+        int visibility = visible ? View.VISIBLE : View.GONE;
+
+        if (topBar != null) {
+            topBar.setVisibility(visibility);
+        }
+
     }
 }

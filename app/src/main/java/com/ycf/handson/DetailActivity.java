@@ -25,7 +25,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.ycf.handson.adapter.GalleryAdapter;
-import com.ycf.handson.manager.BgmManager;
 import com.ycf.handson.manager.FollowStatusManager;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.manager.MediaPreloadManager;
@@ -67,9 +66,7 @@ public class DetailActivity extends AppCompatActivity {
     // --- 数据相关 ---
     private String currentPostId;
     private LikeStatusManager likeStatusManager;
-    private Post currentPost; // 实际帖子数据对象
-
-    private BgmManager bgmManager;
+    private Post currentPost;
 
     private MediaPreloadManager preloadManager;
     private ExoPlayer player;

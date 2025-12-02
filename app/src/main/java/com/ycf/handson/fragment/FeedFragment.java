@@ -51,13 +51,10 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     private MediaPreloadManager mediaPreloadManager;
     private boolean isLoading = false;
 
-    // --- Fragment 生命周期方法 ---
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // 加载 Fragment 自身的布局文件
-        // 假设您的 Feed 列表布局文件是 fragment_feed.xml
         return inflater.inflate(R.layout.fragment_feed, container, false);
     }
 
@@ -81,6 +78,7 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
         this.apiService = new ApiService();
         this.mediaPreloadManager = MediaPreloadManager.getInstance(activity);
         this.adapter = new FeedAdapter(activity, mediaPreloadManager);
+
 
         // 4. 设置和启动
         setupRecycleView();
@@ -212,7 +210,6 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // 清除视图引用，避免内存泄漏
         recyclerView.setAdapter(null);
         recyclerView = null;
         swipeRefreshLayout = null;
