@@ -15,6 +15,8 @@ import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.Post;
 
+import lombok.Getter;
+
 
 public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_POST_ID = "EXTRA_POST_ID";
@@ -26,7 +28,12 @@ public class DetailActivity extends AppCompatActivity {
     private DetailContentController detailContentController;
     private DetailFooterController detailFooterController; // 新增底部控制器
 
+
+    @Getter
     private Post currentPost;
+
+    @Getter
+    private int currentIndex;
     private MediaPreloadManager preloadManager;
     private ExoPlayer player;
     private FollowStatusManager followStatusManager;
@@ -52,15 +59,18 @@ public class DetailActivity extends AppCompatActivity {
 
         // 4. 获取数据并更新UI
         if (getIntent() != null) {
-            Post post = getIntent().getParcelableExtra("EXTRA_POST_OBJECT");
+            Post post = getIntent().getParcelableExtra("post_data");
+            int position = getIntent().getIntExtra("post_position", 0);
+
             if (post != null) {
                 currentPost = post;
-                updateUI(currentPost);
+                currentIndex = position;
+                updateUI(currentPost, currentIndex);
             }
         }
     }
 
-    private void updateUI(Post post) {
+    private void updateUI(Post post, int index) {
         // 1. 更新顶部栏
         detailHeaderController.bind(post);
 

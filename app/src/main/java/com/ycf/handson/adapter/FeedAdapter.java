@@ -2,7 +2,6 @@ package com.ycf.handson.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
+import com.ycf.handson.fragment.FeedFragment;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.manager.MediaPreloadManager;
 import com.ycf.handson.model.Author;
@@ -37,12 +36,19 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     private final LikeStatusManager likeStatusManager;
 
 
+    private final FeedFragment parentFragment;
+
+
     private static final String TAG = "FeedAdapter";
 
-    public FeedAdapter(Context context, MediaPreloadManager mediaPreloadManager) {
+    private static final int REQUEST_CODE_DETAIL = 1001; // 用于启动详情页的请求码
+
+    public FeedAdapter(Context context, MediaPreloadManager mediaPreloadManager, FeedFragment feedFragment) {
+
         this.context = context;
         this.postList = new ArrayList<>();
         this.likeStatusManager = new LikeStatusManager(context);
+        this.parentFragment = feedFragment;
     }
 
     /**
@@ -110,12 +116,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
         }
     }
 
-    private void startDetailActivity(Post post) {
+    private void startDetailActivity(Post post, int position) {
 
-        Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra("EXTRA_POST_OBJECT", post);
-        Log.d("INTENT", post.toString());
-        context.startActivity(intent);
+        parentFragment.startDetailActivityForUpdate(post, position);
+    }
+
+    public void updatePostLike(int position, int newLikeCount) {
+
+        Post post = postList.get(position);
+        post.setLike_count(newLikeCount);
+        notifyItemChanged(position);
+
     }
 
     // ViewHolder是干嘛的 ？ 缓存每个列表项视图（item_post_card.xml）
@@ -154,7 +165,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                 int curPosition = getAbsoluteAdapterPosition();
                 if (curPosition != RecyclerView.NO_POSITION) {
                     Post clickedPost = postList.get(curPosition);
-                    FeedAdapter.this.startDetailActivity(clickedPost);
+                    FeedAdapter.this.startDetailActivity(clickedPost, curPosition);
+
                 }
 
             });

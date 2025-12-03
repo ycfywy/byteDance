@@ -1,6 +1,7 @@
 package com.ycf.handson.fragment; // 建议将 Fragment 放在单独的包中
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.adapter.FeedAdapter;
 import com.ycf.handson.manager.MediaPreloadManager;
@@ -52,6 +56,32 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     private boolean isLoading = false;
 
 
+    private final ActivityResultLauncher<Intent> detailActivityLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        // 当 DetailActivity 结束时，会执行这里的代码
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent data = result.getData();
+                            if (data != null) {
+
+                                int newLikeCount = data.getIntExtra("new_like_count", -1);
+                                int position = data.getIntExtra("post_position", RecyclerView.NO_POSITION);
+
+                                adapter.updatePostLike(position, newLikeCount);
+                            }
+                        }
+                    });
+
+
+    public void startDetailActivityForUpdate(Post post, int position) {
+
+        Intent intent = new Intent(requireContext(), DetailActivity.class);
+        intent.putExtra("post_data", post);
+        intent.putExtra("post_position", position);
+
+        detailActivityLauncher.launch(intent);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,7 +107,7 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
         Activity activity = requireActivity();
         this.apiService = new ApiService();
         this.mediaPreloadManager = MediaPreloadManager.getInstance(activity);
-        this.adapter = new FeedAdapter(activity, mediaPreloadManager);
+        this.adapter = new FeedAdapter(activity, mediaPreloadManager, this);
 
 
         // 4. 设置和启动

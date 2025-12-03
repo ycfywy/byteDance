@@ -2,6 +2,7 @@ package com.ycf.handson.controller;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,6 +11,7 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.FollowStatusManager;
 import com.ycf.handson.model.Author;
@@ -21,7 +23,7 @@ import com.ycf.handson.model.Post;
  */
 public class DetailHeaderController {
 
-    private final Activity activity;
+    private final DetailActivity activity;
     private final Context context;
 
     // --- 顶部栏 Views ---
@@ -39,7 +41,7 @@ public class DetailHeaderController {
      * @param activity            宿主 Activity，用于 findViewById 和 finish 操作。
      * @param followStatusManager 关注状态管理器。
      */
-    public DetailHeaderController(Activity activity, FollowStatusManager followStatusManager) {
+    public DetailHeaderController(DetailActivity activity, FollowStatusManager followStatusManager) {
         this.activity = activity;
         this.context = activity;
         this.followStatusManager = followStatusManager;
@@ -62,7 +64,15 @@ public class DetailHeaderController {
      */
     private void setupListeners() {
         // 返回按钮：直接结束 Activity
-        btnBack.setOnClickListener(v -> activity.finish());
+        btnBack.setOnClickListener(v -> {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("new_like_count", activity.getCurrentPost().getLike_count());
+                    resultIntent.putExtra("post_position", activity.getCurrentIndex());
+                    activity.setResult(Activity.RESULT_OK, resultIntent);
+                    activity.finish();
+                }
+
+        );
     }
 
     /**

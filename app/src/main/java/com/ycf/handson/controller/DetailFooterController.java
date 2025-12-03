@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.LikeStatusManager;
 import com.ycf.handson.model.Post;
@@ -38,7 +39,13 @@ public class DetailFooterController {
     // --- Manager ---
     private final LikeStatusManager likeStatusManager;
 
-    public DetailFooterController(Activity activity, LikeStatusManager likeStatusManager) {
+    private Boolean isLiked;
+
+    private Post curPost;
+
+    private int curIndex;
+
+    public DetailFooterController(DetailActivity activity, LikeStatusManager likeStatusManager) {
         this.context = activity;
         this.likeStatusManager = likeStatusManager;
         initViews(activity);
@@ -86,6 +93,8 @@ public class DetailFooterController {
         btnActionLike.setOnClickListener(v -> {
             // TODO: 实现 toggleLikeStatus(postId) 逻辑
             Toast.makeText(context, "点赞/取消点赞", Toast.LENGTH_SHORT).show();
+
+            updateLikedStatus(!isLiked);
         });
 
         // 3. 评论按钮点击事件
@@ -115,25 +124,37 @@ public class DetailFooterController {
     public void bind(Post post) {
         if (post == null) return;
 
+        curPost = post;
         // 1. 更新点赞数量
         // 假设 Post 模型中有 getLikeCount() 方法
         tvLikeCount.setText(String.valueOf(post.getLike_count()));
-
-        // 2. 更新评论数量 (需要额外的 TextView，但布局中没有 ID，这里假设它有)
-        // TextView tvCommentCount = btnActionComment.findViewById(R.id.tv_comment_count);
-        // if (tvCommentCount != null) {
-        //     tvCommentCount.setText(String.valueOf(post.getCommentCount()));
-        // }
-
-        // 3. 更新点赞图标状态 (需要 LikeStatusManager 配合 postId 判断)
-        // 例如：
-        /*
-        boolean isLiked = likeStatusManager.isLiked(post.getPostId());
+        // 2. 更新点赞图标状态 (需要 LikeStatusManager 配合 postId 判断)
+        isLiked = likeStatusManager.isLiked(post.getPost_id());
         if (isLiked) {
-            ivLike.setImageResource(R.drawable.ic_heart_filled);
+            ivLike.setImageResource(R.drawable.ic_heart_liked);
         } else {
             ivLike.setImageResource(R.drawable.ic_heart_outline);
         }
-        */
+
+    }
+
+    private void updateLikedStatus(boolean status) {
+        // 更新图标
+        isLiked = status;
+        if (isLiked) {
+            ivLike.setImageResource(R.drawable.ic_heart_liked);
+        } else {
+            ivLike.setImageResource(R.drawable.ic_heart_outline);
+        }
+
+        // 处理数据
+        String postId = curPost.getPost_id();
+        int likeCount = curPost.getLike_count();
+        int newLikeCount = status ? likeCount + 1 : likeCount - 1;
+        likeStatusManager.toggleLike(postId, status);
+        curPost.setLike_count(newLikeCount);
+        tvLikeCount.setText(String.valueOf(curPost.getLike_count()));
+
+
     }
 }
