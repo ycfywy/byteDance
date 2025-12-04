@@ -1,0 +1,221 @@
+{
+  "repo_notes": [
+    {
+      "content": ""
+    }
+  ],
+  "pages": [
+    {
+      "title": "概述",
+      "purpose": "对字节跳动（ByteDance）实战 Android 应用的高级介绍、其目的和总体架构",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "项目设置与构建配置",
+      "purpose": "详细解释 Gradle 配置、依赖项、版本目录、SDK 目标以及开发环境设置，包括空安全配置",
+      "parent": "概述",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "应用结构",
+      "purpose": "应用组件、活动（Activities）、权限以及应用在清单文件（manifest）中的结构概述",
+      "parent": "概述",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "导航系统",
+      "purpose": "应用如何处理屏幕之间的导航、片段（Fragment）管理以及基于标签页的导航",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "MainActivity 与 Fragment 管理",
+      "purpose": "管理片段、处理生命周期并协调导航控制器的主要中心活动（Activity）",
+      "parent": "导航系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "导航控制器",
+      "purpose": "底部和顶部导航栏控制器、标签选择处理和样式管理",
+      "parent": "导航系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "动态信息流显示系统",
+      "purpose": "主内容信息流系统，包括滚动、刷新、分页和帖子卡片显示",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "FeedFragment",
+      "purpose": "管理信息流显示、下拉刷新、无限滚动、错误处理和媒体预加载触发器的片段（Fragment）",
+      "parent": "动态信息流显示系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "FeedAdapter 与帖子卡片",
+      "purpose": "RecyclerView 适配器实现、帖子卡片布局、视图持有者（view holder）模式和点赞状态集成",
+      "parent": "动态信息流显示系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "帖子详情系统",
+      "purpose": "最重要的子系统——具有模块化控制器架构的帖子全面详情视图",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "DetailActivity 架构",
+      "purpose": "DetailActivity 如何协调三个控制器、管理生命周期、处理媒体播放协调以及返回结果",
+      "parent": "帖子详情系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "详情控制器",
+      "purpose": "DetailHeaderController（作者和关注）、DetailContentController（媒体和富文本）和 DetailFooterController（操作和点赞）",
+      "parent": "帖子详情系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "富文本与话题标签互动",
+      "purpose": "话题标签如何渲染为可点击的 Span 以及导航到 TagDetailActivity",
+      "parent": "帖子详情系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "媒体管理系统",
+      "purpose": "复杂的媒体预加载、ExoPlayer 集成和图片加载架构",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "MediaPreloadManager",
+      "purpose": "ExoPlayer 的单例管理器、DefaultPreloadManager 集成、媒体预加载策略和播放控制",
+      "parent": "媒体管理系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "画廊与图片显示",
+      "purpose": "ViewPager2 的 GalleryAdapter、片段项布局（clip item layout）以及用于图片加载的 Glide 集成",
+      "parent": "媒体管理系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "个人资料系统",
+      "purpose": "具有折叠工具栏、标签页和滚动行为协调的用户个人资料显示",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "数据层",
+      "purpose": "数据模型、网络通信、状态持久化和整体数据架构",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "数据模型",
+      "purpose": "可序列化数据模型（Parcelable data models）：Post、Author、Clip、Music、Hashtag 和 FeedResponse 及其关系",
+      "parent": "数据层",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "网络 API 层",
+      "purpose": "使用 OkHttp 和 Gson 从字节跳动端点获取信息流数据的 ApiService 实现",
+      "parent": "数据层",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "状态管理器",
+      "purpose": "基于 SharedPreferences 的状态持久化（例如 LikeStatusManager 和 FollowStatusManager）",
+      "parent": "数据层",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "UI 资源与样式",
+      "purpose": "布局文件、可绘制资源（drawable resources）、样式和视觉设计系统",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    }
+  ]
+}
