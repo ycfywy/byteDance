@@ -14,7 +14,7 @@
     <style name="TabTextStyle.Selected" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#333333</item>
         <item name="android:layout_marginEnd">16dp</item>
@@ -23,6 +23,7 @@
 
     <style name="BottomBarLabel_Selected">
         <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">#161823</item>
     </style>
 

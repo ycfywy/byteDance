@@ -174,65 +174,89 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
 
         public void bind(Post post) {
 
-            // 1. 绑定title
             tvTitle.setText(post.getTitle());
 
-            // 2. 绑定作者信息和点赞数
             if (post.getAuthor() != null) {
                 Author author = post.getAuthor();
                 tvAuthorNickname.setText(author.getNickname());
-                // 似乎没有点赞数目 这里random一下
                 tvLikeCount.setText(String.valueOf(post.getLike_count()));
-
-                // 加载头像 (使用 Glide)
                 Glide.with(itemView.getContext())
                         .load(author.getAvatar())
                         .into(ivAuthorAvatar);
 
             }
 
-            // 3. 处理item中的主图 clip
+            int defaultHeight = (int) (((itemView.getContext().getResources().getDisplayMetrics().widthPixels / 2) - 20) / (4.0f / 3.0f));
+            int viewHeight = defaultHeight;
+
+
+            DisplayMetrics dm = itemView.getContext().getResources().getDisplayMetrics();
+
+            int targetWidth = (dm.widthPixels / 2) - 20;
+
+
+            final float MIN_RATIO = 3.0f / 4.0f;
+            final float MAX_RATIO = 4.0f / 3.0f;
+
+
             if (post.getClips() != null && !post.getClips().isEmpty()) {
                 Clip first = post.getClips().get(0);
 
                 String coverUrl = first.getUrl();
-                int width = first.getWidth();
-                int height = first.getHeight();
-                // TODO type先不管
-
+                int originalWidth = first.getWidth(); // 原始宽度
+                int originalHeight = first.getHeight(); // 原始高度
 
                 Log.d(TAG, first.toString());
 
-                if (width > 0 && height > 0) {
+                if (originalWidth > 0 && originalHeight > 0) {
 
-                    // 获取当前屏幕的信息
-                    DisplayMetrics dm = itemView.getContext().getResources().getDisplayMetrics();
-                    // 保持纵横比
-                    int itemWidth = (dm.widthPixels / 2) - 20;
-                    int viewHeight = (int) ((float) height / width * itemWidth);
-                    // 设置 ImageView
-                    // TODO 不懂
+                    float originalRatio = (float) originalWidth / originalHeight;
+                    float finalRatio;
+                    if (originalRatio < MIN_RATIO) {
+                        finalRatio = MIN_RATIO;
+                    } else if (originalRatio > MAX_RATIO) {
+                        finalRatio = MAX_RATIO;
+                    } else {
+                        finalRatio = originalRatio;
+                    }
+
+                    viewHeight = (int) (targetWidth / finalRatio);
+
                     ViewGroup.LayoutParams params = ivCover.getLayoutParams();
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     params.height = viewHeight;
                     ivCover.setLayoutParams(params);
 
+                    Glide.with(itemView.getContext())
+                            .load(coverUrl)
+                            .centerCrop()
+                            .error(R.drawable.error_image)
+                            .into(ivCover);
+
+                } else {
+                    Log.d(TAG, "Clip data invalid or empty. Showing error image with default ratio.");
+                    viewHeight = (int) (targetWidth / MAX_RATIO);
+
+                    ViewGroup.LayoutParams params = ivCover.getLayoutParams();
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    params.height = viewHeight;
+                    ivCover.setLayoutParams(params);
+                    ivCover.setImageResource(R.drawable.error_image);
+                    ivCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 }
-                Glide.with(itemView.getContext())
-                        .load(coverUrl)
-                        .error(R.drawable.error_image)
-                        .into(ivCover);
-
-
             } else {
-                // TODO 这里设置为不可见
-                Log.d(TAG, String.valueOf(post.getClips() == null));
+                Log.d(TAG, "No clips data. Showing error image with default ratio.");
+                viewHeight = (int) (targetWidth / MAX_RATIO);
+                ViewGroup.LayoutParams params = ivCover.getLayoutParams();
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.height = viewHeight;
+                ivCover.setLayoutParams(params);
+
                 ivCover.setImageResource(R.drawable.error_image);
+                ivCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
 
-            // 4. 新增：处理点赞的逻辑(点赞的heart图片放在 text view里面 不是很懂)
             updateLikeUI(post.isLiked(), post.getLike_count());
-
             ivLikeIcon.setOnClickListener(v -> {
 
                 boolean newLiked = !post.isLiked();

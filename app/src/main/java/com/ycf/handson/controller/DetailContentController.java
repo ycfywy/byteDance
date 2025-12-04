@@ -9,7 +9,6 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -74,7 +73,8 @@ public class DetailContentController {
             public void onClick(View v) {
                 isPlay = !isPlay;
                 player.setPlayWhenReady(isPlay);
-                // 可以在这里更新 BGM 图标
+
+                ivBgmIcon.setImageResource(isPlay ? R.drawable.ic_volume_up : R.drawable.ic_volume_off);
             }
         });
     }
@@ -85,16 +85,13 @@ public class DetailContentController {
     public void bind(Post post) {
         if (post == null) return;
 
-        // 1. 媒体/BGM
-        preloadManager.play(post.getMusic());
 
-        // 2. 文本内容
+        preloadManager.play(post.getMusic());
         tvPostTitle.setText(post.getTitle());
-        // 直接调用内部的富文本渲染方法
+
         renderPostContent(post, tvPostContent);
         tvPostDate.setText(DateUtil.formatRelativeTime(post.getCreate_time()));
 
-        // 3. 画廊 ViewPager2
         setupGallery(post.getClips());
     }
 
@@ -177,27 +174,37 @@ public class DetailContentController {
         }
     }
 
+    /**
+     * 设置 ViewPager 或类似组件的指示器。
+     *
+     * @param count 指示器的总数。
+     */
     private void setupIndicators(int count) {
+
         if (count <= 1) {
             layoutIndicators.setVisibility(View.GONE);
             return;
         }
 
+
         layoutIndicators.removeAllViews();
+
+        final int margin3dpPx = (int) (context.getResources().getDisplayMetrics().density * 3);
+        final int height3dpPx = (int) (context.getResources().getDisplayMetrics().density * 3);
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f
+                0,                          // width = 0dp, 配合 weight 实现等分宽度
+                height3dpPx,                // height = 3dp 的像素值
+                1.0f                        // weight = 1.0f, 实现平均分配宽度
         );
 
-        int marginPx = (int) (context.getResources().getDisplayMetrics().density * 4);
-        params.setMargins(marginPx, 0, marginPx, 0);
+
+        params.setMargins(margin3dpPx / 2, 0, margin3dpPx / 2, 0);
 
         for (int i = 0; i < count; i++) {
             View indicator = new View(context);
 
             indicator.setLayoutParams(params);
-            indicator.getLayoutParams().height = (int) (context.getResources().getDisplayMetrics().density * 3);
             indicator.setBackgroundResource(R.drawable.indicator_bar_unselected);
             layoutIndicators.addView(indicator);
         }

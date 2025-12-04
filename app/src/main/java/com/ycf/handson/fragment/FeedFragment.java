@@ -41,8 +41,8 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     // 静态常量保持不变
     private static final String TAG = "FeedFragment";
     private static final int SPAN_COUNT = 2;
-    private static final int VISIBLE_THRESHOLD = 5;
-    private static final int LOAD_LIMIT = 20;
+    private static final int VISIBLE_THRESHOLD = 10;
+    private static final int LOAD_LIMIT = 30;
 
     // 视图变量使用 ViewBinding 最佳，但为匹配原代码结构，此处使用 findViewById
     private RecyclerView recyclerView;
@@ -233,7 +233,7 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
         }
         isLoading = true;
         // 首次加载，使用 10 个限制（原代码中的值）
-        apiService.fetchFeed(10, false, this);
+        apiService.fetchFeed(LOAD_LIMIT, false, this);
     }
 
     // --- 内存清理：在 Fragment 销毁视图时清理资源 ---
