@@ -3,6 +3,8 @@ package com.ycf.handson.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import lombok.Data;
 
 @Data
@@ -10,25 +12,24 @@ public class Music implements Parcelable {
     // 音量
     private int volume;
     // 起始播放位置（单位：ms）
-    private int seek_time;
+    @SerializedName("seek_time")
+    private int seekTime;
     // 音乐链接
     private String url;
 
     // --- Parcelable 实现 ---
 
-    public Music() {
-    }
 
     protected Music(Parcel in) {
         volume = in.readInt();
-        seek_time = in.readInt();
+        seekTime = in.readInt();
         url = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(volume);
-        dest.writeInt(seek_time);
+        dest.writeInt(seekTime);
         dest.writeString(url);
     }
 

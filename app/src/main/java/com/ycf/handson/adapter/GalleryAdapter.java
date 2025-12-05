@@ -75,11 +75,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 Glide.with(context)
                         .load(clip.getUrl())
                         .centerCrop()
-                        .error(R.drawable.img_placeholder_avatar)
+                        .placeholder(R.drawable.loading_image)
+                        .error(R.drawable.error_image)
                         .into(imageView);
-
-            } else {
-
 
             }
 

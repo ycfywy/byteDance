@@ -8,8 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.ycf.handson.DetailActivity;
 import com.ycf.handson.R;
 import com.ycf.handson.manager.LikeStatusManager;
@@ -24,7 +22,6 @@ public class DetailFooterController {
     private final Context context;
 
     // --- 底部栏 Views ---
-    private ConstraintLayout layoutBottomBar;
     private TextView inputCommentPlaceholder;
 
     // 动作组
@@ -43,7 +40,6 @@ public class DetailFooterController {
 
     private Post curPost;
 
-    private int curIndex;
 
     public DetailFooterController(DetailActivity activity, LikeStatusManager likeStatusManager) {
         this.context = activity;
@@ -56,8 +52,6 @@ public class DetailFooterController {
      * 绑定底部栏 Views。
      */
     private void initViews(Activity activity) {
-        // 外部容器
-        layoutBottomBar = activity.findViewById(R.id.layout_bottom_bar);
 
         // 评论输入占位符
         inputCommentPlaceholder = activity.findViewById(R.id.input_comment_placeholder);
@@ -126,10 +120,9 @@ public class DetailFooterController {
 
         curPost = post;
         // 1. 更新点赞数量
-        // 假设 Post 模型中有 getLikeCount() 方法
         tvLikeCount.setText(String.valueOf(post.getLike_count()));
-        // 2. 更新点赞图标状态 (需要 LikeStatusManager 配合 postId 判断)
-        isLiked = likeStatusManager.isLiked(post.getPost_id());
+        // 2. 更新点赞图标状态
+        isLiked = likeStatusManager.isLiked(post.getPostId());
         if (isLiked) {
             ivLike.setImageResource(R.drawable.ic_heart_liked);
         } else {
@@ -148,7 +141,7 @@ public class DetailFooterController {
         }
 
         // 处理数据
-        String postId = curPost.getPost_id();
+        String postId = curPost.getPostId();
         int likeCount = curPost.getLike_count();
         int newLikeCount = status ? likeCount + 1 : likeCount - 1;
         likeStatusManager.toggleLike(postId, status);

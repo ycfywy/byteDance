@@ -3,12 +3,15 @@ package com.ycf.handson.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import lombok.Data;
 
 @Data
 public class Author implements Parcelable {
     // 用户ID
-    private String user_id;
+    @SerializedName("user_id")
+    private String userId;
     // 用户昵称
     private String nickname;
     // 头像链接
@@ -16,19 +19,16 @@ public class Author implements Parcelable {
 
     // --- Parcelable 实现 ---
 
-    public Author() {
-        // 无参构造函数，Lombok 生成或手动添加
-    }
 
     protected Author(Parcel in) {
-        user_id = in.readString();
+        userId = in.readString();
         nickname = in.readString();
         avatar = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(user_id);
+        dest.writeString(userId);
         dest.writeString(nickname);
         dest.writeString(avatar);
     }

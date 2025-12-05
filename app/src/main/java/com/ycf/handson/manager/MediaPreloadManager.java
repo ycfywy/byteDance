@@ -33,14 +33,12 @@ import lombok.Getter;
 @OptIn(markerClass = UnstableApi.class)
 public class MediaPreloadManager {
 
-    // 1. 静态私有实例变量：用于保存唯一的单例实例
     private static MediaPreloadManager instance;
 
     /**
      * -- GETTER --
      * 获取 DefaultPreloadManager 实例，以便配置媒体项或控制预加载。
      */
-    // 2. 核心成员变量：保存预加载管理器和播放器实例
     @Getter
     private final DefaultPreloadManager preloadManager;
     /**
@@ -50,17 +48,11 @@ public class MediaPreloadManager {
     @Getter
     private final ExoPlayer player;
 
-    // 假设这是需要被外部更新的变量
-    private int currentPlayingIndex = 5;
-
-
     private Map<String, MediaItem> postId2Media;
 
-    // 3. 私有构造函数：阻止外部创建实例
 
     private MediaPreloadManager(@NonNull Context context) {
 
-        // 预加载状态控制逻辑（匿名内部类）
         TargetPreloadStatusControl<Integer, DefaultPreloadManager.PreloadStatus> targetPreloadStatusControl =
                 new TargetPreloadStatusControl<>() {
                     @Nullable
@@ -100,17 +92,8 @@ public class MediaPreloadManager {
             player.setMediaItem(mediaItem);
         }
         player.prepare();
-        player.seekTo(music.getSeek_time());
+        player.seekTo(music.getSeekTime());
         player.play();
-    }
-
-    public void pause() {
-
-        player.pause();
-    }
-
-    public void release() {
-        preloadManager.release();
     }
 
 
@@ -119,14 +102,14 @@ public class MediaPreloadManager {
         post.forEach(new Consumer<Post>() {
             @Override
             public void accept(Post post) {
-                if (!postId2Media.containsKey(post.getPost_id())) {
-                    postId2Media.put(post.getPost_id(), MediaItem.fromUri(post.getMusic().getUrl()));
-                    preloadManager.add(Objects.requireNonNull(postId2Media.get(post.getPost_id())), 0);
+                if (!postId2Media.containsKey(post.getPostId())) {
+                    postId2Media.put(post.getPostId(), MediaItem.fromUri(post.getMusic().getUrl()));
+                    preloadManager.add(Objects.requireNonNull(postId2Media.get(post.getPostId())), 0);
                 }
             }
         });
 
-        Set<String> curCollect = post.stream().map(Post::getPost_id).collect(Collectors.toSet());
+        Set<String> curCollect = post.stream().map(Post::getPostId).collect(Collectors.toSet());
         Iterator<Map.Entry<String, MediaItem>> iterator = postId2Media.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, MediaItem> entry = iterator.next();

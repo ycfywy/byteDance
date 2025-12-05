@@ -3,6 +3,8 @@ package com.ycf.handson.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -11,13 +13,15 @@ import lombok.Data;
 @Data
 public class Post implements Parcelable {
     // 作品ID
-    private String post_id;
+    @SerializedName("post_id")
+    private String postId;
     // 作品标题
     private String title;
     // 作品正文
     private String content;
     // 作品创建时间戳
-    private long create_time;
+    @SerializedName("create_time")
+    private long createTime;
 
     // Parcelable 对象
     private Author author;
@@ -34,15 +38,12 @@ public class Post implements Parcelable {
 
     // --- Parcelable 实现 ---
 
-    public Post() {
-        // 确保有一个无参构造函数
-    }
 
     protected Post(Parcel in) {
-        post_id = in.readString();
+        postId = in.readString();
         title = in.readString();
         content = in.readString();
-        create_time = in.readLong();
+        createTime = in.readLong();
 
         // 读取 Author (Parcelable)
         author = in.readParcelable(Author.class.getClassLoader());
@@ -63,10 +64,10 @@ public class Post implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(post_id);
+        dest.writeString(postId);
         dest.writeString(title);
         dest.writeString(content);
-        dest.writeLong(create_time);
+        dest.writeLong(createTime);
 
         // 写入 Author (Parcelable)
         dest.writeParcelable(author, flags);

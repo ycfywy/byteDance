@@ -41,7 +41,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
 
     private static final String TAG = "FeedAdapter";
 
-    private static final int REQUEST_CODE_DETAIL = 1001; // 用于启动详情页的请求码
 
     public FeedAdapter(Context context, MediaPreloadManager mediaPreloadManager, FeedFragment feedFragment) {
 
@@ -78,7 +77,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Post post = postList.get(position);
         // 从pref中获取isLiked
-        post.setLiked(likeStatusManager.isLiked(post.getPost_id()));
+        post.setLiked(likeStatusManager.isLiked(post.getPostId()));
         holder.bind(post);
 
     }
@@ -152,10 +151,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
             ivCover = itemView.findViewById(R.id.post_media_image);
             tvTitle = itemView.findViewById(R.id.post_title);
 
-            // 绑定作者信息和点赞 (ID 必须与 item_post_card.xml 中定义的 ID 匹配)
-            tvAuthorNickname = itemView.findViewById(R.id.author_nickname); // 原来的昵称TextView
-            ivAuthorAvatar = itemView.findViewById(R.id.author_avatar);     // 新增的头像ImageView
-            tvLikeCount = itemView.findViewById(R.id.like_count);           // 新增的点赞数量TextView
+            // 绑定作者信息和点赞
+            tvAuthorNickname = itemView.findViewById(R.id.author_nickname);
+            ivAuthorAvatar = itemView.findViewById(R.id.author_avatar);
+            tvLikeCount = itemView.findViewById(R.id.like_count);
             ivLikeIcon = itemView.findViewById(R.id.like_icon);
 
 
@@ -203,8 +202,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
                 Clip first = post.getClips().get(0);
 
                 String coverUrl = first.getUrl();
-                int originalWidth = first.getWidth(); // 原始宽度
-                int originalHeight = first.getHeight(); // 原始高度
+                int originalWidth = first.getWidth();
+                int originalHeight = first.getHeight();
 
                 Log.d(TAG, first.toString());
 
@@ -260,7 +259,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.PostViewHolder
             ivLikeIcon.setOnClickListener(v -> {
 
                 boolean newLiked = !post.isLiked();
-                likeStatusManager.toggleLike(post.getPost_id(), newLiked);
+                likeStatusManager.toggleLike(post.getPostId(), newLiked);
                 int newCount = post.getLike_count() + ((newLiked) ? 1 : -1);
                 post.setLike_count(newCount);
                 post.setLiked(newLiked);

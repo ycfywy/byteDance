@@ -49,7 +49,6 @@ public class ApiService {
                 .addQueryParameter("accept_video_clip", acceptVideoClip ? "true" : "false")
                 .build();
 
-        Log.d(TAG, "Requesting URL: " + url.toString());
 
         Request request = new Request.Builder().url(url).build();
 
@@ -69,11 +68,11 @@ public class ApiService {
                         Log.d(TAG, "Received JSON: " + json);
                         System.out.println("==========" + json);
                         FeedResponse feedResponse = gson.fromJson(json, FeedResponse.class);
-                        if (feedResponse.getStatus_code() == 0) {
-                            Log.i(TAG, "Data fetched successfully. Posts count: " + feedResponse.getPost_list().size());
+                        if (feedResponse.getStatusCode() == 0) {
+                            Log.i(TAG, "Data fetched successfully. Posts count: " + feedResponse.getPostList().size());
                             callback.onSuccess(feedResponse);
                         } else {
-                            String errorMsg = "接口状态码错误: " + feedResponse.getStatus_code();
+                            String errorMsg = "接口状态码错误: " + feedResponse.getStatusCode();
                             Log.w(TAG, errorMsg);
                             callback.onFailure(errorMsg);
                         }

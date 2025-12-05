@@ -38,18 +38,15 @@ import java.util.stream.IntStream;
  */
 public class FeedFragment extends Fragment implements ApiService.FeedCallback {
 
-    // 静态常量保持不变
     private static final String TAG = "FeedFragment";
     private static final int SPAN_COUNT = 2;
     private static final int VISIBLE_THRESHOLD = 10;
     private static final int LOAD_LIMIT = 30;
 
-    // 视图变量使用 ViewBinding 最佳，但为匹配原代码结构，此处使用 findViewById
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout loadErrorLayout;
 
-    // 逻辑和数据管理变量
     private FeedAdapter adapter;
     private ApiService apiService;
     private MediaPreloadManager mediaPreloadManager;
@@ -59,7 +56,6 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     private final ActivityResultLauncher<Intent> detailActivityLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        // 当 DetailActivity 结束时，会执行这里的代码
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Intent data = result.getData();
                             if (data != null) {
@@ -136,14 +132,11 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
     }
 
     public void setupSwipeRefresh() {
-        // 使用方法引用
         swipeRefreshLayout.setOnRefreshListener(this::refreshFeed);
     }
 
-    // 供外部调用的刷新函数（例如，在 tab_home 被点击时）
+
     public void triggerRefresh() {
-        // 确保在主线程执行 UI 操作，但 Fragment 所在的 Activity 运行在主线程，
-        // 且 View 的操作默认在主线程，这里可以简化为直接调用 refreshFeed()
         refreshFeed();
     }
 
@@ -201,8 +194,8 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
         int[] firstVisibleItemPositions = manager.findFirstVisibleItemPositions(null);
         int[] lastVisibleItemPositions = manager.findLastVisibleItemPositions(null);
 
-        // 使用 max() 确保找到真正的边界
-        int l = Arrays.stream(firstVisibleItemPositions).min().orElse(0); // 应该用 min() 找到最小的起始位置
+
+        int l = Arrays.stream(firstVisibleItemPositions).min().orElse(0);
         int r = Arrays.stream(lastVisibleItemPositions).max().orElse(0);
 
         List<Post> postList = adapter.getPostList();
@@ -232,7 +225,6 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
             return;
         }
         isLoading = true;
-        // 首次加载，使用 10 个限制（原代码中的值）
         apiService.fetchFeed(LOAD_LIMIT, false, this);
     }
 
@@ -252,13 +244,12 @@ public class FeedFragment extends Fragment implements ApiService.FeedCallback {
 
     @Override
     public void onSuccess(FeedResponse response) {
-        // 使用 getActivity() 来确保 Fragment 仍然依附于 Activity
+
         if (getActivity() == null) return;
 
-        // 切换到主线程更新 UI
         getActivity().runOnUiThread(() -> {
-            if (response.getPost_list() != null && !response.getPost_list().isEmpty()) {
-                adapter.appendData(response.getPost_list());
+            if (response.getPostList() != null && !response.getPostList().isEmpty()) {
+                adapter.appendData(response.getPostList());
             } else {
                 Toast.makeText(requireContext(), "UI: 未获取到帖子数据", Toast.LENGTH_SHORT).show();
             }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyAwesomeApp</string>
+    <string name="app_name">The Current</string>
     <string name="menu_descrip">menu图标</string>
     <string name="tab_shangcheng">商城</string>
     <string name="tab_beijing">北京</string>

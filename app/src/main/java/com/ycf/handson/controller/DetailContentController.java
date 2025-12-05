@@ -90,7 +90,7 @@ public class DetailContentController {
         tvPostTitle.setText(post.getTitle());
 
         renderPostContent(post, tvPostContent);
-        tvPostDate.setText(DateUtil.formatRelativeTime(post.getCreate_time()));
+        tvPostDate.setText(DateUtil.formatRelativeTime(post.getCreateTime()));
 
         setupGallery(post.getClips());
     }
@@ -173,6 +173,7 @@ public class DetailContentController {
             layoutIndicators.setVisibility(View.GONE);
         }
     }
+
 
     /**
      * 设置 ViewPager 或类似组件的指示器。

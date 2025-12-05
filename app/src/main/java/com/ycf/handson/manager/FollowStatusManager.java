@@ -39,7 +39,7 @@ public class FollowStatusManager {
 
         prefs.edit()
                 .putBoolean(authorId, newStatus)
-                .apply(); // 使用 apply 异步保存，避免阻塞主线程
+                .apply();
 
         return newStatus;
     }

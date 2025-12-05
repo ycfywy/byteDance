@@ -86,8 +86,8 @@ public class DetailHeaderController {
         if (author != null) {
             tvAuthorName.setText(author.getNickname());
             Glide.with(context).load(author.getAvatar()).into(ivAuthorAvatar);
-            updateFollowButtonUI(author.getUser_id());
-            btnFollow.setOnClickListener(v -> toggleFollow(author.getUser_id()));
+            updateFollowButtonUI(author.getUserId());
+            btnFollow.setOnClickListener(v -> toggleFollow(author.getUserId()));
 
         } else {
             tvAuthorName.setText("未知作者");
