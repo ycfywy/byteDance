@@ -17,7 +17,7 @@ import com.ycf.handson.R;
 public class ProfileFragment extends Fragment {
 
     private TabLayout tabLayout;
-    private ViewPager2 viewPager; // 尽管我们不再使用，但保留以匹配布局
+    private ViewPager2 viewPager;
     private ImageView btnBack;
 
     // 标签页标题
@@ -26,7 +26,6 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // 1. 加载布局文件
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -34,7 +33,7 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 2. 初始化视图
+        //初始化视图
         tabLayout = view.findViewById(R.id.tab_layout);
         viewPager = view.findViewById(R.id.view_pager);
         btnBack = view.findViewById(R.id.btn_back);
@@ -44,12 +43,10 @@ public class ProfileFragment extends Fragment {
             tabLayout.addTab(tabLayout.newTab().setText(title));
         }
 
-        // 4. (可选) 如果您需要知道哪个 Tab 被选中，可以添加监听器
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // 当前选中 Tab 的位置：tab.getPosition()
-                // 您可以在这里添加逻辑来替换 Fragment 或加载内容
+
             }
 
             @Override
@@ -63,9 +60,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // 5. 设置返回按钮逻辑
         btnBack.setOnClickListener(v -> {
-            // 在 Fragment 中实现“返回”操作
             if (getActivity() != null) {
                 getParentFragmentManager().popBackStack();
             }

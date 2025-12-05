@@ -15,7 +15,6 @@ import com.ycf.handson.fragment.ProfileFragment;
 import com.ycf.handson.listener.OnTabSelectedListener;
 
 
-// MainActivity 实现 OnTabSelectedListener 接口
 public class MainActivity extends AppCompatActivity implements OnTabSelectedListener {
 
     private FragmentManager fragmentManager;

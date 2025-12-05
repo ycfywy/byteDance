@@ -17,27 +17,13 @@ public class LikeStatusManager {
         this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    /**
-     *
-     *
-     *
-     * @param postId
-     * @return
-     */
+
     public boolean isLiked(String postId) {
         Set<String> s = prefs.getStringSet(KEY_LIKED_POST_IDS, new HashSet<>());
         return s.contains(postId);
     }
 
 
-    /**
-     *
-     *
-     *
-     * @param postId
-     * @param isLiked
-     * @return
-     */
     public boolean toggleLike(String postId, boolean isLiked) {
         Set<String> s = prefs.getStringSet(KEY_LIKED_POST_IDS, new HashSet<>());
         Set<String> newLikedIds = new HashSet<>(s);

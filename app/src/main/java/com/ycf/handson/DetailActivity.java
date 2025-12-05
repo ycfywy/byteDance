@@ -26,7 +26,7 @@ public class DetailActivity extends AppCompatActivity {
     // --- Controller 实例 ---
     private DetailHeaderController detailHeaderController;
     private DetailContentController detailContentController;
-    private DetailFooterController detailFooterController; // 新增底部控制器
+    private DetailFooterController detailFooterController;
 
 
     @Getter
@@ -37,7 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     private MediaPreloadManager preloadManager;
     private ExoPlayer player;
     private FollowStatusManager followStatusManager;
-    private LikeStatusManager likeStatusManager; // 新增 LikeStatusManager
+    private LikeStatusManager likeStatusManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,13 +48,12 @@ public class DetailActivity extends AppCompatActivity {
         preloadManager = MediaPreloadManager.getInstance(this);
         player = preloadManager.getPlayer();
         followStatusManager = new FollowStatusManager(this);
-        likeStatusManager = new LikeStatusManager(this); // 初始化 LikeStatusManager
-
+        likeStatusManager = new LikeStatusManager(this);
 
         // 初始化 Controllers 并注入依赖
         detailHeaderController = new DetailHeaderController(this, followStatusManager);
         detailContentController = new DetailContentController(this, preloadManager, player);
-        detailFooterController = new DetailFooterController(this, likeStatusManager); // 注入 LikeStatusManager
+        detailFooterController = new DetailFooterController(this, likeStatusManager);
 
 
         // 4. 获取数据并更新UI

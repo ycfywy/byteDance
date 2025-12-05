@@ -19,7 +19,7 @@ public class TopNavigationController implements View.OnClickListener {
 
     private List<TextView> allTabs;
     private TextView selectedTab = null;
-    private static final String TAG = "TabController"; // 推荐使用常量标签
+    private static final String TAG = "TabController";
 
 
     /**
